@@ -23,7 +23,7 @@ as well as to verify your TL classifier.
 TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 '''
 
-LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
+LOOKAHEAD_WPS = 20 # Number of waypoints we will publish. You can change this number
 
 
 class WaypointUpdater(object):
@@ -41,7 +41,7 @@ class WaypointUpdater(object):
         # TODO: Add other member variables you need below
         self.base_waypoints = None
         self.pose = None
-        self.waypoint_2d = None
+        self.waypoints_2d = None
         self.waypoint_tree = None
 
         self.loop()
@@ -61,8 +61,8 @@ class WaypointUpdater(object):
         closest_idx = self.waypoint_tree.query([x,y], 1)[1]
 
         # Check if closest is ahead or behind vehicle
-        closest_coord = self.waypoint_2d[closest_idx]
-        prev_coord = self.waypoint_2d[closest_idx-1]
+        closest_coord = self.waypoints_2d[closest_idx]
+        prev_coord = self.waypoints_2d[closest_idx-1]
 
         # Equation for hyperplane through closest_coords
         cl_vect = np.array(closest_coord)
@@ -72,7 +72,7 @@ class WaypointUpdater(object):
         val = np.dot(cl_vect-prev_vect, pos_vect-cl_vect)
 
         if val > 0:
-            closest_idx = (closest_idx + 1) % len(self.waypoint_2d)
+            closest_idx = (closest_idx + 1) % len(self.waypoints_2d)
         return closest_idx
 
     def publish_waypoints(self, closest_idx):
@@ -80,14 +80,14 @@ class WaypointUpdater(object):
         lane.header = self.base_waypoints.header
         lane.waypoints =  self.base_waypoints.waypoints[closest_idx:closest_idx+LOOKAHEAD_WPS]
         self.final_waypoints_pub.publish(lane)
-        
+
     def pose_cb(self, msg):
         self.pose = msg
 
     def waypoints_cb(self, waypoints):
         self.base_waypoints = waypoints
         if not self.waypoints_2d:
-            self.waypoint_2d = [[waypoint.pose.pose.position.x, waypoint.pose.pose.position.y] for waypoint in waypoints.waypoints]
+            self.waypoints_2d = [[waypoint.pose.pose.position.x, waypoint.pose.pose.position.y] for waypoint in waypoints.waypoints]
             self.waypoint_tree =  KDTree(self.waypoints_2d)
 
     def traffic_cb(self, msg):
