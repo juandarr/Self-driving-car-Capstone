@@ -107,7 +107,7 @@ class DBWNode(object):
         self.linear_vel = msg.twist.linear.x
         self.angular_vel = msg.twist.angular.z
 
-    def dbw_enabled_cb(self,msg):
+    def dbw_enable_cb(self,msg):
         self.dbw_enabled = msg
 
     def velocity_cb(self, msg):
