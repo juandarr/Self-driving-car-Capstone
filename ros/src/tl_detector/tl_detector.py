@@ -9,10 +9,13 @@ from cv_bridge import CvBridge
 from light_classification.tl_classifier import TLClassifier
 import tf
 import cv2
+import os
 import yaml
+import numpy
 from scipy.spatial import KDTree
 
 STATE_COUNT_THRESHOLD = 3
+SAVE_PATH = '../../../images_tl/'
 
 class TLDetector(object):
     def __init__(self):
@@ -53,6 +56,8 @@ class TLDetector(object):
         self.waypoints_2d = None
         self.waypoint_tree = None
 
+        self.counter = 0
+
         rospy.spin()
 
     def pose_cb(self, msg):
@@ -75,8 +80,13 @@ class TLDetector(object):
             msg (Image): image from car-mounted camera
 
         """
+        self.counter += 1
+        if (self.counter % 4 != 0):
+            return
         self.has_image = True
         self.camera_image = msg
+        #open_cv_image = numpy.array(msg) 
+        #cv2.imwrite(os.path.join(SAVE_PATH , 'tl_'+str(self.counter)+'.jpg'), open_cv_image)
         light_wp, state = self.process_traffic_lights()
 
         '''
