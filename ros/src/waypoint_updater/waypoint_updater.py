@@ -25,7 +25,7 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 '''
 
 LOOKAHEAD_WPS = 100 # Number of waypoints we will publish. You can change this number
-MAX_DECEL = 10.
+MAX_DECEL = 5.
 
 
 class WaypointUpdater(object):
@@ -98,7 +98,7 @@ class WaypointUpdater(object):
         for i,wp in enumerate(waypoints):
             p = Waypoint()
             p.pose = wp.pose
-            stop_idx = max(self.stopline_wp_idx - closest_idx - 30, 0)
+            stop_idx = max(self.stopline_wp_idx - closest_idx - 3, 0)
             dist = self.distance(waypoints, i, stop_idx)
             vel = math.sqrt(2*MAX_DECEL*dist)
             if vel < 1.:
@@ -118,7 +118,7 @@ class WaypointUpdater(object):
 
     def traffic_cb(self, msg):
         self.stopline_wp_idx = msg.data
-        #print('Here is the message:',msg.data)
+        print('Here is the message:',self.stopline_wp_idx)
 
     def obstacle_cb(self, msg):
         # TODO: Callback for /obstacle_waypoint message. We will implement it later
