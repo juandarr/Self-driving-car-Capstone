@@ -7,10 +7,17 @@ class TLClassifier(object):
     def __init__(self):
         ## Test model
         path_to_graph = r'traffic_light.pb' 
-        self.path_to_labels = r'udacity_label_map.pbtxt'
-        self.num_classes = 4
+        path_to_labels = r'udacity_label_map.pbtxt'
+        num_classes = 4
+        IMAGE_SIZE = (12, 8)
+
         self.graph = load_graph(path_to_graph)
-        
+
+        label_map = label_map_util.load_labelmap(path_to_labels)
+        categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=num_classes, use_display_name=True)
+        category_index = label_map_util.create_category_index(categories)
+        print(category_index)
+
     def load_graph(graph_file):
         """Loads a frozen inference graph"""
         graph = tf.Graph()
@@ -37,5 +44,22 @@ class TLClassifier(object):
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
 
         """
-        #TODO implement light color prediction
+        with self.graph.as_default():
+            with tf.Session(graph= self.graph) as sess:
+                image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
+                detect_scores = detection_graph.get_tensor_by_name('detection_scores:0')
+                detect_classes = detection_graph.get_tensor_by_name('detection_classes:0')
+ 
+                
+                image_np = load_image_into_numpy_array(image)
+                image_expanded = np.expand_dims(image_np, axis=0)
+                
+                (scores, classes) = sess.run(
+                    [detect_scores, detect_classes],
+                    feed_dict={image_tensor: image_expanded})
+                
+                print('SCORES')
+                print(scores[0])
+                print('CLASSES')
+                print(classes[0])
         return TrafficLight.UNKNOWN
