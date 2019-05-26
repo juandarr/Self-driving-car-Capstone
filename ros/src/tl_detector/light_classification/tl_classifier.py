@@ -12,6 +12,7 @@ class TLClassifier(object):
         IMAGE_SIZE = (12, 8)
 
         self.graph = load_graph(path_to_graph)
+        self.classes = ['Green', 'Red', 'Yellow', 'Unknown']
 
         label_map = label_map_util.load_labelmap(path_to_labels)
         categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=num_classes, use_display_name=True)
@@ -46,9 +47,9 @@ class TLClassifier(object):
         """
         with self.graph.as_default():
             with tf.Session(graph= self.graph) as sess:
-                image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
-                detect_scores = detection_graph.get_tensor_by_name('detection_scores:0')
-                detect_classes = detection_graph.get_tensor_by_name('detection_classes:0')
+                image_tensor = self.graph.get_tensor_by_name('image_tensor:0')
+                detect_scores = self.graph.get_tensor_by_name('detection_scores:0')
+                detect_classes = self.graph.get_tensor_by_name('detection_classes:0')
  
                 
                 image_np = load_image_into_numpy_array(image)
@@ -62,4 +63,5 @@ class TLClassifier(object):
                 print(scores[0])
                 print('CLASSES')
                 print(classes[0])
+                print('MAX CLASS TYPE: ', self.classes[int(classes[0][0]-1)])
         return TrafficLight.UNKNOWN
