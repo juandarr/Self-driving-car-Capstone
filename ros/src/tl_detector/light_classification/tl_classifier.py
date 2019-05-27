@@ -6,7 +6,7 @@ import datetime
 
 class TLClassifier(object):
     def __init__(self):
-        path_to_graph = r'traffic_light.pb' 
+        path_to_graph = r'light_classification/tl_classifier.pb' 
 
         self.image_tensor = None
         self.boxes = None
@@ -15,7 +15,22 @@ class TLClassifier(object):
         self.num_detections = None
         self.sess = None
 
-        self.graph = load_graph(path_to_graph)
+        self.graph = tf.Graph()
+        with self.graph.as_default():
+            od_graph_def = tf.GraphDef()
+            with tf.gfile.GFile(path_to_graph, 'rb') as fid:
+                serialized_graph = fid.read()
+                od_graph_def.ParseFromString(serialized_graph)
+                tf.import_graph_def(od_graph_def, name='')
+
+            self.image_tensor = self.graph.get_tensor_by_name('image_tensor:0')
+            self.boxes = self.graph.get_tensor_by_name('detection_boxes:0')
+            self.scores = self.graph.get_tensor_by_name('detection_scores:0')
+            self.classes = self.graph.get_tensor_by_name('detection_classes:0')
+            self.num_detections = self.graph.get_tensor_by_name(
+                'num_detections:0')
+
+        self.sess = tf.Session(graph=self.graph)
 
         self.threshold = .5
 
@@ -56,7 +71,7 @@ class TLClassifier(object):
             start =  datetime.datetime.now()
             (boxes, scores, classes, num_detections) = self.sess.run(
                 [self.boxes, self.scores, self.classes, self.num_detections],
-                feed_dict={image_tensor: image_expanded})
+                feed_dict={self.image_tensor: image_expanded})
             end = datetime.datetime.now()
 
             c = end - start
@@ -66,8 +81,8 @@ class TLClassifier(object):
         scores = np.squeeze(scores)
         classes = np.squeeze(classes).astype(np.int32)
 
-        print('SCORES: ', scores[0])
-        print('CLASSES: ', classes[0])
+        #print('SCORES: ', scores[0])
+        #print('CLASSES: ', classes[0])
         
         if scores[0] > self.threshold:
             if classes[0] == 1:
@@ -79,5 +94,4 @@ class TLClassifier(object):
             elif classes[0] == 3:
                 print('YELLOW')
                 return TrafficLight.YELLOW
-
         return TrafficLight.UNKNOWN
