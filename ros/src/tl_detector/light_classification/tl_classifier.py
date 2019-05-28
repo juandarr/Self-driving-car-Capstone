@@ -6,7 +6,7 @@ import datetime
 
 class TLClassifier(object):
     def __init__(self):
-        path_to_graph = r'light_classification/tl_classifier.pb' 
+        path_to_graph = r'light_classification/tl_mobilenet.pb' 
 
         self.image_tensor = None
         self.boxes = None
@@ -77,10 +77,12 @@ class TLClassifier(object):
             c = end - start
             print('Inference time: ', c.total_seconds())
         
-        boxes = np.squeeze(boxes)
-        scores = np.squeeze(scores)
-        classes = np.squeeze(classes).astype(np.int32)
+        #boxes = np.squeeze(boxes)
+        #scores = np.squeeze(scores)
+        #classes = np.squeeze(classes).astype(np.int32)
 
+        scores = scores[0]
+        classes = classes[0].astype(np.uint8)
         #print('SCORES: ', scores[0])
         #print('CLASSES: ', classes[0])
         
@@ -88,10 +90,10 @@ class TLClassifier(object):
             if classes[0] == 1:
                 print('GREEN')
                 return TrafficLight.GREEN
-            elif classes[0] == 2:
+            elif classes[0] == 3:
                 print('RED')
                 return TrafficLight.RED
-            elif classes[0] == 3:
+            elif classes[0] == 2:
                 print('YELLOW')
                 return TrafficLight.YELLOW
         return TrafficLight.UNKNOWN

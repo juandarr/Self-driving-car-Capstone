@@ -13,7 +13,7 @@ import yaml
 import numpy as np
 from scipy.spatial import KDTree
 
-STATE_COUNT_THRESHOLD = 3
+STATE_COUNT_THRESHOLD = 2
 SAVE_PATH = '../../../images_tl/'
 
 class TLDetector(object):
@@ -56,7 +56,7 @@ class TLDetector(object):
         self.state_count = 0
 
         self.counter = 0
-
+        #if self.pose is not None and self.waypoints is not None and self.camera_image is not None:
         rospy.spin()
 
     def pose_cb(self, msg):
@@ -81,6 +81,7 @@ class TLDetector(object):
         """
         self.has_image = True
         self.camera_image = msg
+
         if self.counter % 4 ==0 and self.waypoint_tree:
             #open_cv_image = np.array(msg) 
             #cv2.imwrite(os.path.join(SAVE_PATH , 'tl_'+str(self.counter)+'.jpg'), open_cv_image)
