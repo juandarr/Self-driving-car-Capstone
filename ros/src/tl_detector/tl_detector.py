@@ -14,7 +14,6 @@ import numpy as np
 from scipy.spatial import KDTree
 
 STATE_COUNT_THRESHOLD = 2
-SAVE_PATH = '../../../images_tl/'
 
 class TLDetector(object):
     def __init__(self):
@@ -43,6 +42,7 @@ class TLDetector(object):
 
         self.upcoming_red_light_pub = rospy.Publisher('/traffic_waypoint', Int32, queue_size=1)
 
+        self.waypoints = None
         self.waypoints_2d = None
         self.waypoint_tree = None
         
@@ -56,7 +56,7 @@ class TLDetector(object):
         self.state_count = 0
 
         self.counter = 0
-        #if self.pose is not None and self.waypoints is not None and self.camera_image is not None:
+
         rospy.spin()
 
     def pose_cb(self, msg):
@@ -82,7 +82,7 @@ class TLDetector(object):
         self.has_image = True
         self.camera_image = msg
 
-        if self.counter % 4 ==0 and self.waypoint_tree:
+        if self.counter%3==0 and self.pose is not None and self.waypoints is not None and self.camera_image is not None:
             #open_cv_image = np.array(msg) 
             #cv2.imwrite(os.path.join(SAVE_PATH , 'tl_'+str(self.counter)+'.jpg'), open_cv_image)
             light_wp, state = self.process_traffic_lights()
@@ -108,6 +108,8 @@ class TLDetector(object):
             else:
                 self.upcoming_red_light_pub.publish(Int32(self.last_wp))
             self.state_count += 1
+            if self.counter==2000:
+                self.counter = -1
         self.counter += 1
 
     def get_closest_waypoint(self,x,y):

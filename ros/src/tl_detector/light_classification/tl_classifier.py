@@ -6,7 +6,7 @@ import datetime
 
 class TLClassifier(object):
     def __init__(self):
-        path_to_graph = r'light_classification/tl_mobilenet.pb' 
+        path_to_graph = r'light_classification/ssd_mobilenet_v1.pb' 
 
         self.image_tensor = None
         self.boxes = None
@@ -32,7 +32,7 @@ class TLClassifier(object):
 
         self.sess = tf.Session(graph=self.graph)
 
-        self.threshold = .5
+        self.threshold = .6
 
 
     def load_graph(self, graph_file):
@@ -83,17 +83,17 @@ class TLClassifier(object):
 
         scores = scores[0]
         classes = classes[0].astype(np.uint8)
-        #print('SCORES: ', scores[0])
-        #print('CLASSES: ', classes[0])
+        print('SCORES: ', scores[0])
+        print('CLASSES: ', classes[0])
         
         if scores[0] > self.threshold:
             if classes[0] == 1:
                 print('GREEN')
                 return TrafficLight.GREEN
-            elif classes[0] == 3:
+            elif classes[0] == 2:
                 print('RED')
                 return TrafficLight.RED
-            elif classes[0] == 2:
+            elif classes[0] == 3:
                 print('YELLOW')
                 return TrafficLight.YELLOW
         return TrafficLight.UNKNOWN

@@ -12,7 +12,7 @@ import tf
 import rospy
 
 CSV_HEADER = ['x', 'y', 'z', 'yaw']
-MAX_DECEL = 1.0
+MAX_DECEL = 5.0
 
 
 class WaypointLoader(object):
@@ -24,6 +24,7 @@ class WaypointLoader(object):
 
         self.velocity = self.kmph2mps(rospy.get_param('~velocity'))
         self.new_waypoint_loader(rospy.get_param('~path'))
+        
         rospy.spin()
 
     def new_waypoint_loader(self, path):
