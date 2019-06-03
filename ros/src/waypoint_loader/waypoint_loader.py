@@ -12,7 +12,7 @@ import tf
 import rospy
 
 CSV_HEADER = ['x', 'y', 'z', 'yaw']
-MAX_DECEL = 5.0
+MAX_DECEL = 1.0
 
 
 class WaypointLoader(object):

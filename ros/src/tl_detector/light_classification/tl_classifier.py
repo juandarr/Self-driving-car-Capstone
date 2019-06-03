@@ -8,7 +8,7 @@ import cv2
 
 class TLClassifier(object):
     def __init__(self):
-        path_to_graph = r'light_classification/ssd_mobilenet_v1.pb' 
+        path_to_graph = r'light_classification/ssd_mobilenet_v1_optimized.pb' 
 
         self.image_tensor = None
         self.boxes = None
@@ -16,6 +16,8 @@ class TLClassifier(object):
         self.classes = None
         self.num_detections = None
         self.sess = None
+
+        self.c = ['RED', 'GREEN', 'YELLOW']
 
         self.graph = tf.Graph()
         with self.graph.as_default():
@@ -33,8 +35,10 @@ class TLClassifier(object):
                 'num_detections:0')
 
         self.sess = tf.Session(graph=self.graph)
+        
+        self.camera_feed = False
 
-        self.threshold = .6
+        self.threshold = .3
 
 
     def load_graph(self, graph_file):
@@ -78,30 +82,26 @@ class TLClassifier(object):
 
             c = end - start
             print('Inference time: ', c.total_seconds())
-        
-        #boxes = np.squeeze(boxes)
-        #scores = np.squeeze(scores)
-        #classes = np.squeeze(classes).astype(np.int32)
 
-        #image = cv2.cvtColor(image,cv2.COLOR_RGB2BGR)
-        #self.out.write(image)
-        cv2.imshow('my webcam', image)
-        cv2.waitKey(1)
-
-        scores = scores[0]
-        classes = classes[0].astype(np.uint8)
-        print('SCORES: ', scores[0])
-        print('CLASSES: ', classes[0])
-        print('Detections: ',num_detections)
+        score_f = scores[0]
+        class_f = classes[0].astype(np.uint8)
+        print('SCORES: ', score_f)
+        print('CLASSES: ', class_f)
         
-        if scores[0] > self.threshold:
-            if classes[0] == 1:
+        # Show camera feed when flag is true
+        if self.camera_feed:
+            cv2.imshow('my webcam', image)
+            cv2.waitKey(1)
+        
+        
+        if score_f[0] > self.threshold:
+            if class_f[0] == 1:
                 print('GREEN')
                 return TrafficLight.GREEN
-            elif classes[0] == 2:
+            elif class_f[0] == 2:
                 print('RED')
                 return TrafficLight.RED
-            elif classes[0] == 3:
+            elif class_f[0] == 3:
                 print('YELLOW')
                 return TrafficLight.YELLOW
         return TrafficLight.UNKNOWN

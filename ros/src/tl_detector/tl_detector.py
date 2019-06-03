@@ -13,7 +13,7 @@ import yaml
 import numpy as np
 from scipy.spatial import KDTree
 
-STATE_COUNT_THRESHOLD = 2
+STATE_COUNT_THRESHOLD = 3
 
 class TLDetector(object):
     def __init__(self):
@@ -81,9 +81,9 @@ class TLDetector(object):
         """
         self.has_image = True
         self.camera_image = msg
-        #self.counter%2==0 and 
-        if self.pose is not None and self.waypoints is not None and self.camera_image is not None:
-            #open_cv_image = np.array(msg) 
+
+        # Use the classifier every third image
+        if self.counter%3==0 and self.pose is not None and self.waypoints is not None and self.camera_image is not None:
             #cv2.imwrite(os.path.join(SAVE_PATH , 'tl_'+str(self.counter)+'.jpg'), open_cv_image)
             light_wp, state = self.process_traffic_lights()
 
@@ -103,12 +103,11 @@ class TLDetector(object):
                 self.last_state = self.state
                 light_wp = light_wp if state == TrafficLight.RED else -1
                 self.last_wp = light_wp
-                #print("Publishing change of value.")
                 self.upcoming_red_light_pub.publish(Int32(light_wp))
             else:
                 self.upcoming_red_light_pub.publish(Int32(self.last_wp))
             self.state_count += 1
-        #self.counter += 1
+        self.counter += 1
 
     def get_closest_waypoint(self,x,y):
         """Identifies the closest path waypoint to the given position
