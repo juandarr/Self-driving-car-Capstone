@@ -81,8 +81,8 @@ class TLDetector(object):
         """
         self.has_image = True
         self.camera_image = msg
-
-        if self.counter%3==0 and self.pose is not None and self.waypoints is not None and self.camera_image is not None:
+        #self.counter%2==0 and 
+        if self.pose is not None and self.waypoints is not None and self.camera_image is not None:
             #open_cv_image = np.array(msg) 
             #cv2.imwrite(os.path.join(SAVE_PATH , 'tl_'+str(self.counter)+'.jpg'), open_cv_image)
             light_wp, state = self.process_traffic_lights()
@@ -108,7 +108,7 @@ class TLDetector(object):
             else:
                 self.upcoming_red_light_pub.publish(Int32(self.last_wp))
             self.state_count += 1
-        self.counter += 1
+        #self.counter += 1
 
     def get_closest_waypoint(self,x,y):
         """Identifies the closest path waypoint to the given position

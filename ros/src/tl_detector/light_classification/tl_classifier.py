@@ -2,6 +2,8 @@ from styx_msgs.msg import TrafficLight
 import numpy as np
 import tensorflow as tf
 import datetime 
+import cv2
+
 
 
 class TLClassifier(object):
@@ -81,10 +83,16 @@ class TLClassifier(object):
         #scores = np.squeeze(scores)
         #classes = np.squeeze(classes).astype(np.int32)
 
+        #image = cv2.cvtColor(image,cv2.COLOR_RGB2BGR)
+        #self.out.write(image)
+        cv2.imshow('my webcam', image)
+        cv2.waitKey(1)
+
         scores = scores[0]
         classes = classes[0].astype(np.uint8)
         print('SCORES: ', scores[0])
         print('CLASSES: ', classes[0])
+        print('Detections: ',num_detections)
         
         if scores[0] > self.threshold:
             if classes[0] == 1:
