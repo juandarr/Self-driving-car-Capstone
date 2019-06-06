@@ -81,12 +81,12 @@ class TLClassifier(object):
             end = datetime.datetime.now()
 
             c = end - start
-            print('Inference time: ', c.total_seconds())
+            #print('Inference time: ', c.total_seconds())
 
         score_f = scores[0]
         class_f = classes[0].astype(np.uint8)
-        print('SCORES: ', score_f)
-        print('CLASSES: ', class_f)
+        #print('SCORES: ', score_f)
+        #print('CLASSES: ', class_f)
         
         # Show camera feed when flag is true
         if self.camera_feed:
@@ -96,12 +96,12 @@ class TLClassifier(object):
         
         if score_f[0] > self.threshold:
             if class_f[0] == 1:
-                print('GREEN')
+                print('GREEN light detected.')
                 return TrafficLight.GREEN
             elif class_f[0] == 2:
-                print('RED')
+                print('RED light detected.')
                 return TrafficLight.RED
             elif class_f[0] == 3:
-                print('YELLOW')
+                print('YELLOW light detected.')
                 return TrafficLight.YELLOW
         return TrafficLight.UNKNOWN
