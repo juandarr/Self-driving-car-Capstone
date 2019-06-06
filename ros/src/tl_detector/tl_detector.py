@@ -83,7 +83,7 @@ class TLDetector(object):
         self.camera_image = msg
 
         # Use the classifier every third image
-        if self.counter%3==0 and self.pose is not None and self.waypoints is not None and self.camera_image is not None:
+        if self.counter%2==0 and self.pose is not None and self.waypoints is not None and self.camera_image is not None:
             #cv2.imwrite(os.path.join(SAVE_PATH , 'tl_'+str(self.counter)+'.jpg'), open_cv_image)
             light_wp, state = self.process_traffic_lights()
 
